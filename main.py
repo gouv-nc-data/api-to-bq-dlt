@@ -22,20 +22,14 @@ logging.captureWarnings(True)
 os.environ["RUNTIME__LOG_LEVEL"] = log_level_name
 os.environ["RUNTIME__LOG_FORMAT"] = "JSON"
 
-def get_secret(secret_id):
+def get_secret(secret_name):
     """Récupère un secret depuis GCP Secret Manager."""
     client = secretmanager.SecretManagerServiceClient()
-    project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-    if not project_id:
-        logging.error("GOOGLE_CLOUD_PROJECT variable d'environnement manquante pour Secret Manager.")
-        return None
-        
-    name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
     try:
-        response = client.access_secret_version(request={"name": name})
+        response = client.access_secret_version(request={"name": secret_name})
         return response.payload.data.decode("UTF-8").strip()
     except Exception as e:
-        logging.error(f"Erreur lors de l'accès au secret {secret_id}: {e}")
+        logging.error(f"Erreur lors de l'accès au secret {secret_name}: {e}")
         return None
 
 def run_pipeline():
